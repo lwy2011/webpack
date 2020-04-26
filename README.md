@@ -21,7 +21,7 @@ node 写的,node写法commonJS规范！
 
 - 入口，出口
 entry：相对路径。
-output = [filename,path:绝对路径]。
+output = [filename,path:绝对路径，flename[hash:5]文件名哈希化，避免覆盖，缓存也避免出错]。
 - mode 模式
 production , development
 
@@ -38,4 +38,38 @@ production , development
 - 自定义配置文件
 
 `scripts 内 ：yarn webpack --config filename`
+
+
+- 内置的server
+
+`yarn add webpack-dev-server` 
+添加，精髓是，是内存中的服务数据！而不是实体的文件数据
+`yarn webpack-dev-server`
+默认运行，到当前项目的根目录，而不是**dist/bundle.js**。需要配置目录。
+
+ - webpack.config.js中，添加devServer配置！命令行加入开发时的命令！
+ devServer :
+ port 端口
+ progress 进度条
+ contentBase 打开的目录
+ compress Gzip压缩
+ 
+- 如何处理html文件：
+    
+    把js引入到html中，然后整体打包！html文件就是模板，js文件是注入模板的内容！
+    webpack-html-plugin插件
+    
+    - webpack.config.js ：
+   `  plugins:[
+        new WebpackHtmlPlugin({
+            template:path地址，
+            filename:打包好的html文件名
+            minify:压缩 [去双引号，折叠成一行，哈希name]
+        })
+     ] `
+
+   
+
+
+
 
