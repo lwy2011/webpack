@@ -140,8 +140,33 @@ production , development
     这时候直接运行，报错：` No PostCSS Config found in: /Users`。
     创建postcss的配置文件：
     `
-    
+        module.exports ={
+            plugins:[
+                require('autoprefixer')({
+                    browsers: ["last 5 version"]
+                })
+            ]
+        }    
     `
+    
+    - 压缩打包css文件
+    
+  optimize-css-assets-webpack-plugin 
+  
+  配置文件中：
+  `
+      optimization: {  //优化项
+          minimizer: [
+              new OptimizeCssAssetsPlugin()，
+              //这里需要配置js压缩的配置，否则js不会被压缩的！
+          ]
+      },
+      mode : 'production'   //这里很重要！！
+  `
+    
+    
+    
+    
     
     
     

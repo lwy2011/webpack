@@ -1,13 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 module.exports = {
     entry: "./src/index.js",//入口
     output: {
         filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
         path: path.resolve(__dirname, "./dist")  //路径绝对路径
     },
-    mode: "development", //生产模式，开发模式 production
+    mode: "production", //生产模式，开发模式 production
     devServer: {  //开发服务器配置
         port: 3000,  //端口
         progress: true,//进度条
@@ -25,9 +26,16 @@ module.exports = {
             }
         }),
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
-            filename:'main.css'
-        })
+            filename: "main.css"
+        }),
+
     ],
+    optimization: {  //优化项
+        minimizer: [
+            //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
+            new OptimizeCssAssetsPlugin(),
+        ]
+    },
     module: {//模块
         rules: [  //规则,匹配文件，处理文件
             // {
@@ -46,10 +54,11 @@ module.exports = {
                     //     //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
                     // },
                     // 'style-loader',   //css数据流放入style标签
+                    //压缩css文件：
                     MiniCssExtractPlugin.loader,   //独立成一个css文件
                     "css-loader",   //css文件@import css文件
-                    'postcss-loader',  //转成css数据类型后加前缀
-                    'sass-loader'  //scss转为css
+                    "postcss-loader",  //转成css数据类型后加前缀
+                    "sass-loader"  //scss转为css
                 ]
             },
 
