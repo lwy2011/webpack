@@ -102,6 +102,47 @@ production , development
     - 抽离css文件，不插入html，单独放入一个文件
     
     mini-css-extract-plugin 插件！
+    plugins中:
+    `
+          new MiniCssExtractPlugin({  //抽离css单独成一个css文件
+                    filename:'main.css'
+                })
+    `
+    molude 中：
+    `
+         {
+            // less , sass stylus node-sass sass-loader ,stylus stylus-loader
+            test: /\.s?css$/,
+            use: [
+                MiniCssExtractPlugin.loader,   //独立成一个css文件
+                "css-loader",   //css文件@import css文件
+                'sass-loader'  //scss转为css
+            ]
+         },
+    `
+    
+    - 如何添加后缀，浏览器的各种前缀？
+    
+    postcss-loader ，autoprefixer 依赖
+    
+    在处理成css格式的数据后，用postcss-loader处理！配置文件中，module :
+    `
+         {
+            test: /\.s?css$/,
+            use: [
+                MiniCssExtractPlugin.loader,   //独立成一个css文件
+                "css-loader",   //css文件@import css文件
+                "postcss-loader",  //加前缀的loader
+                'sass-loader'  //scss转为css
+            ]
+         },
+    `
+    这时候直接运行，报错：` No PostCSS Config found in: /Users`。
+    创建postcss的配置文件：
+    `
+    
+    `
+    
     
     
 

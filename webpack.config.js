@@ -48,6 +48,7 @@ module.exports = {
                     // 'style-loader',   //css数据流放入style标签
                     MiniCssExtractPlugin.loader,   //独立成一个css文件
                     "css-loader",   //css文件@import css文件
+                    'postcss-loader',  //转成css数据类型后加前缀
                     'sass-loader'  //scss转为css
                 ]
             },
