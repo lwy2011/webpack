@@ -144,13 +144,11 @@ production , development
     这时候直接运行，报错：` No PostCSS Config found in: /Users`。
     创建postcss的配置文件：
     `
-        module.exports ={
-            plugins:[
-                require('autoprefixer')({
-                    browsers: ["last 5 version"]
-                })
-            ]
-        }    
+       module.exports ={
+           plugins:[
+               require('autoprefixer')({ overrideBrowserslist: ['iOS >= 7', 'Android >= 4.0'] })
+           ]
+       }
     `
     
     - 压缩打包css文件
@@ -171,8 +169,24 @@ production , development
    
    - es6变es5
    babel-loader @babel/core @babel/preset-env
-    
-    
+     @babel/plugin-proposal-class-properties  //高级语法帮助映射
+  module :
+  `
+       {  //转es5
+          test: /\.m?js$/,
+          exclude: /(node_modules|bower_components)/,
+          use: {
+              loader: 'babel-loader',   //解析js文件数据
+              options: {
+                  presets: ['@babel/preset-env'],   //映射转化一些高级语法
+                  plugins:[
+                      ["@babel/plugin-proposal-decorators", { "legacy": true }],//class
+                      ["@babel/plugin-proposal-class-properties", { "loose" : true }], //装饰器
+                  ]
+              }
+          }
+       }
+  `
     
     
     

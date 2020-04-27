@@ -67,7 +67,11 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',   //解析js文件数据
                     options: {
-                        presets: ['@babel/preset-env']   //映射转化高级语法
+                        presets: ['@babel/preset-env'],   //映射转化一些高级语法
+                        plugins:[
+                            ["@babel/plugin-proposal-decorators", { "legacy": true }],//class
+                            ["@babel/plugin-proposal-class-properties", { "loose" : true }], //装饰器
+                        ]
                     }
                 }
             }

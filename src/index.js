@@ -5,3 +5,21 @@ const a = () => {
     console.log(88);
 };
 a();
+const log = A => {
+    console.log(A, 999);
+};
+
+@log
+class S {
+    constructor() {
+        this.x = 2;
+    }
+}
+
+const s = new S();
+console.log(s);
+const x = async () => {
+    await console.log("装饰器");
+};
+x();
+
