@@ -23,5 +23,15 @@ module.exports = {
                 hash:true   , //缓存问题
             }
         })
-    ]
+    ],
+    module:{//模块
+        rules: [  //规则,匹配文件，处理文件
+            {
+                //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
+                //loader 有顺序的,默认从右向左，从下到上执行！
+                //更多的参数配置写法：{loader:'style-loader',options:{**:**}}
+                test:/\.css$/,use:['style-loader','css-loader'],
+            }
+        ]
+    }
 };

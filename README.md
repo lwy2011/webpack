@@ -54,9 +54,9 @@ production , development
  contentBase 打开的目录
  compress Gzip压缩
  
-- 如何处理html文件：
+- 如何处理js文件打包后放入指定的html文件：
     
-    把js引入到html中，然后整体打包！html文件就是模板，js文件是注入模板的内容！
+    把js引入到html中！html文件就是模板，js文件是注入模板的内容！
     webpack-html-plugin插件
     
     - webpack.config.js ：
@@ -68,8 +68,39 @@ production , development
         })
      ] `
 
-   
-
+- 如何引入css
+      
+    因为html是模板，把css插入就好了！
+    
+    - 首先，如何导入css文件？
+    
+    不可能是link标签写在html文件了，因为地址错了，打包后的文件名，以及路径都是不可知！
+    用node的模块意识，在js文件中导入css文件就可以导入了！
+    
+    - 导入后，就打包，报错！
+    
+    `You may need an appropriate loader to handle this file type, 
+    currently no loaders are configured to process this file. `
+    node原生是js写的，所以天然亲近js文件,在js文件中导入css文件，webpack会知道如何打包？
+    
+    - 提示：需要对应的加载解析模块来处理css文件！
+    
+    js文件的解析规则肯定不适合css文件。
+    在配置文件中，对module属性进行配置：
+    `
+    module:{//模块
+            rules: [  //规则,匹配文件，处理文件
+                {
+                    //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
+                    //loader 有顺序的,默认从右向左，从下到上执行！
+                    //更多的参数配置写法：{loader:'style-loader',options:{**:**}}
+                    test:/\.css$/,use:['style-loader','css-loader'],
+                }
+            ]
+        }
+    `
+    
+    
 
 
 
