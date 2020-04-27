@@ -99,6 +99,9 @@ production , development
             ]
         }
     `
+    - 抽离css文件，不插入html，单独放入一个文件
+    
+    mini-css-extract-plugin 插件！
     
     
 

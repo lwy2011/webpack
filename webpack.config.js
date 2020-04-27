@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
     entry: "./src/index.js",//入口
     output: {
@@ -22,25 +23,35 @@ module.exports = {
                 collapseWhitespace: true, //折叠空行html
                 hash: true, //缓存问题
             }
+        }),
+        new MiniCssExtractPlugin({  //抽离css单独成一个css文件
+            filename:'main.css'
         })
     ],
     module: {//模块
         rules: [  //规则,匹配文件，处理文件
+            // {
+            //     //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
+            //     //loader 有顺序的,默认从右向左，从下到上执行！
+            //     //更多的参数配置写法：{loader:'style-loader',options:{**:**}}
+            //     test:/\.css$/,
+            //     use:['style-loader','css-loader']
+            // },
             {
-                //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
-                //loader 有顺序的,默认从右向左，从下到上执行！
-                //更多的参数配置写法：{loader:'style-loader',options:{**:**}}
                 // less , sass stylus node-sass sass-loader ,stylus stylus-loader
                 test: /\.s?css$/,
                 use: [
-                    {
-                        loader: "style-loader",
-                        //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
-                    },
+                    // {
+                    //     loader: "style-loader",
+                    //     //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
+                    // },
+                    // 'style-loader',   //css数据流放入style标签
+                    MiniCssExtractPlugin.loader,   //独立成一个css文件
                     "css-loader",   //css文件@import css文件
                     'sass-loader'  //scss转为css
                 ]
-            }
+            },
+
         ]
     }
 };
