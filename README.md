@@ -168,8 +168,9 @@ production , development
    ### js 
    
    - es6变es5
+   
    babel-loader @babel/core @babel/preset-env
-     @babel/plugin-proposal-class-properties  //高级语法帮助映射
+     @babel/plugin-proposal-class-properties @babel/plugin-proposal-class-properties  //高级语法帮助映射
   module :
   `
        {  //转es5
@@ -187,6 +188,51 @@ production , development
           }
        }
   `
+  - js 语法处理和校验
+  
+  转译机械转译同一目标，多处出现，多处转译，代码浪费：
+  
+  @babel/plugin-transform-runtime  
+  @babel/runtime  注意！这个是dependencies里的依赖！！！
+  
+  `   {  //转es5
+          test: /\.m?js$/,
+          exclude: /node_modules|bower_components)/,  //查找的js文件的范围，还有include:
+          include: path.resolve(__dirname, "src"),
+          use: {
+              loader: "babel-loader",   //解析js文件数据
+              options: {
+                  presets: ["@babel/preset-env"],   //映射转化一些高级语法
+                  plugins: [
+                      ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                      ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                      //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                      "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+    
+                  ],
+              },
+          }
+      },
+  `
+  
+  - eslint 做语法校验
+  
+  `
+   {
+      //校验：eslint
+      // 需要 eslint ,eslint-loader ,并去其官网选择对应的设置，下载.eslintrc.json文件做配置！
+      //https://eslint.org/demo/
+      test: /\.js$/,
+      use: {
+          loader: "eslint-loader",
+          options: {fix: true},//浅显的语法问题，自动修复！
+      },
+      enforce:'pre'   ,//强制先执行后处理js。
+   }
+      `
+  
+  
+  
     
     
     

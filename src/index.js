@@ -23,3 +23,13 @@ const x = async () => {
 };
 x();
 
+function * y(){
+    yield 1
+}
+
+console.log(y().next());
+new Promise((resolve => {
+    console.log("p");
+}))
+
+console.log("dsdf".includes("f"));

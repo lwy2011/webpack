@@ -14,6 +14,7 @@ module.exports = {
         progress: true,//进度条
         contentBase: "./dist", //打开的目录
         compress: true,//Gzip压缩
+        overlay: true, //eslint 校验代码语法不合规范就报错！
     },
     plugins: [  //插件
         new HtmlWebpackPlugin({
@@ -65,15 +66,32 @@ module.exports = {
                 test: /\.m?js$/,
                 exclude: /(node_modules|bower_components)/,
                 use: {
-                    loader: 'babel-loader',   //解析js文件数据
+                    loader: "babel-loader",   //解析js文件数据
                     options: {
-                        presets: ['@babel/preset-env'],   //映射转化一些高级语法
-                        plugins:[
-                            ["@babel/plugin-proposal-decorators", { "legacy": true }],//class
-                            ["@babel/plugin-proposal-class-properties", { "loose" : true }], //装饰器
-                        ]
-                    }
+                        presets: ["@babel/preset-env"],   //映射转化一些高级语法
+                        plugins: [
+                            ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                            ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                            //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                            "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+
+                        ],
+                        exclude: /node_modules/,  //查找的js文件的范围，还有include:
+                        include: path.resolve(__dirname, "src"),
+                    },
+
                 }
+            },
+            {
+                //校验：eslint
+                // 需要 eslint ,eslint-loader ,并去其官网选择对应的设置，下载.eslintrc.json文件做配置！
+                //https://eslint.org/demo/
+                test: /\.js$/,
+                use: {
+                    loader: "eslint-loader",
+                    options: {fix: true},//浅显的语法问题，自动修复！
+                },
+                enforce:'pre'   ,//强制先执行后处理js。
             }
         ]
     }
