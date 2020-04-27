@@ -1,4 +1,5 @@
 @import "a.css";
+@import "./style/index.scss";
 div{
     background: beige;
 }
