@@ -8,7 +8,7 @@ module.exports = {
         filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
         path: path.resolve(__dirname, "./dist")  //路径绝对路径
     },
-    mode: "production", //生产模式，开发模式 production
+    mode: "development", //生产模式，开发模式 production
     devServer: {  //开发服务器配置
         port: 3000,  //端口
         progress: true,//进度条
@@ -30,7 +30,7 @@ module.exports = {
         }),
 
     ],
-    optimization: {  //优化项
+    optimization: {  //优化项,生产模式才用的：
         minimizer: [
             //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
             new OptimizeCssAssetsPlugin(),
@@ -61,7 +61,16 @@ module.exports = {
                     "sass-loader"  //scss转为css
                 ]
             },
-
+            {  //转es5
+                test: /\.m?js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',   //解析js文件数据
+                    options: {
+                        presets: ['@babel/preset-env']   //映射转化高级语法
+                    }
+                }
+            }
         ]
     }
 };

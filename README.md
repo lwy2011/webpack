@@ -54,6 +54,8 @@ production , development
  contentBase 打开的目录
  compress Gzip压缩
  
+### html
+
 - 如何处理js文件打包后放入指定的html文件：
     
     把js引入到html中！html文件就是模板，js文件是注入模板的内容！
@@ -67,6 +69,8 @@ production , development
             minify:压缩 [去双引号，折叠成一行，哈希name]
         })
      ] `
+
+### css
 
 - 如何引入css
       
@@ -163,8 +167,10 @@ production , development
       },
       mode : 'production'   //这里很重要！！
   `
-    
-    
+   ### js 
+   
+   - es6变es5
+   babel-loader @babel/core @babel/preset-env
     
     
     
