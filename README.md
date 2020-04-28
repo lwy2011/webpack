@@ -276,7 +276,14 @@ production , development
             })
         ],`
    
-   3. 引入不打包，script标签形式！注意打包的时候，设置externals字段去掉它，因为script已经script标签引入了！
+   3. 引入不打包，script标签形式！注意打包的时候，设置externals字段去掉它，因为jquery已经script标签引入了！
+   
+   防止有人在模块内还导入jquery！导致打包生成的代码量太多！
+   
+   ` externals: {  //不需要打包的依赖：比如外部用script的全局文件变量
+            jquery:'jQuery'
+        },
+   `
   
     
     

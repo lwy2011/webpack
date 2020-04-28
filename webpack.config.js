@@ -30,15 +30,18 @@ module.exports = {
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
             filename: "main.css"
         }),
-        new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
-            $:'jquery'
-        })
+        // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
+        //     $:'jquery'
+        // })
     ],
     optimization: {  //优化项,生产模式才用的：
         minimizer: [
             //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
             new OptimizeCssAssetsPlugin(),
         ]
+    },
+    externals: {  //不需要打包的依赖：比如外部用script的全局文件变量,内部文件中有人又导入这个依赖了
+        jquery:'$'
     },
     module: {//模块
         rules: [  //规则,匹配文件，处理文件
