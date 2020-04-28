@@ -231,7 +231,44 @@ production , development
    }
       `
   
-  
+   ### 变为全局变量
+   
+   以jquery为例：
+   通常要用：
+   `import $ from 'jquery'
+`
+    我不想写这句引入，就想所有的模块内直接用$!
+    
+   1. expose-loader 暴露全局变量的loader ,放在**window**上
+   
+   在入口文件顶层：
+   `
+   require("expose-loader?libraryName!./file.js");
+   // 通过属性名 "libraryName" 暴露 file.js 的 exports 到全局上下文。
+   // 在浏览器中，就将可以使用 window.libraryName 访问。
+   
+   require("expose-loader?$!jquery"); 
+   //注意！！因为后续导入的包可能需要$,所以，先执行它，再引入后续的其他的包！！否则，后续的包拿不到的！
+   
+   或者在配置文件中设置：
+   
+   module: {
+     rules: [{
+             test: require.resolve('jquery'),
+             use: [{
+                 loader: 'expose-loader',
+                 options: 'jQuery'        //多个属性名占位，有几个写几个，window.$,window.jQuery
+             },{
+                 loader: 'expose-loader',
+                 options: '$'
+             }]
+         }]
+   }
+   `
+   2. webpack.providePlugin 每个模块都注入
+   
+   
+   3. 引入不打包，script标签形式！注意打包的时候，设置externals字段去掉它，因为script已经script标签引入了！
   
     
     

@@ -82,17 +82,30 @@ module.exports = {
 
                 }
             },
-            {
-                //校验：eslint
-                // 需要 eslint ,eslint-loader ,并去其官网选择对应的设置，下载.eslintrc.json文件做配置！
-                //https://eslint.org/demo/
-                test: /\.js$/,
-                use: {
-                    loader: "eslint-loader",
-                    options: {fix: true},//浅显的语法问题，自动修复！
-                },
-                enforce:'pre'   ,//强制先执行后处理js。
-            }
+            // {
+            //     //校验：eslint
+            //     // 需要 eslint ,eslint-loader ,并去其官网选择对应的设置，下载.eslintrc.json文件做配置！
+            //     //https://eslint.org/demo/
+            //     test: /\.js$/,
+            //     use: {
+            //         loader: "eslint-loader",
+            //         options: {fix: true},//浅显的语法问题，自动修复！
+            //     },
+            //     enforce:'pre'   ,//强制先执行后处理js。
+            // },
+
+            {    //暴露全局变量的时候，用expose-loader做，
+                // 同样的，入口文件，顶级优先导入jquery，否则先导入其他模块可能会用的时候，window.$还不存在！
+                test: require.resolve('jquery'),
+                use: [{
+                    loader: 'expose-loader',
+                    options: 'jQuery'
+                },{
+                    loader: 'expose-loader',
+                    options: '$'
+                }]
+            },
+
         ]
     }
 };
