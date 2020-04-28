@@ -285,9 +285,79 @@ production , development
         },
    `
   
+  ## 图片
+  
+  图片打包，先引入图片，引入的值实质是一个hash的图片地址！！
+  
+  1. js中创建
+  
+ ` import xx.png from 'xxx'  `
+  `  {   
+       test:/\.(png|svg|jpg|gif|jpeg)$/,
+       use:{
+           loader:'file-loader'
+       }
+   }`
+  
+  2. css中
+  
+  很简单，相对定位就可以了！
+  
+  ` p{
+       width:200px;height: 200px;
+       background: url('./my.png');
+     }`
+     
+     打包后的css url也是新的hash地址！
+  
+  3. html 中
     
+    因为打包后的图片地址无法确定，所以如何在html中写img的src呢？
+    写成相对定位的地址值，然后：
     
+    html-withimg-loader 。
+   
+   ` {   //图片打包，先引入图片，引入的值实质是一个hash的图片地址！！
+        test:/\.(png|svg|jpg|gif|jpeg)$/,
+        use:{
+            loader:'file-loader',
+            options:{
+                esModule:false    ,  //文档说什么默认是用的es的import 导入文件模块的，
+                // 而不是CommonJS ，这里不设置它，就会使得下面处理html的img失效，
+                // 我猜html-withimg-loader是commonJS 的结果写的，而es输出的结果成了一个对象了！
+            }
+        }
+    },
+    { //处理html中的图片
+        test:/\.html$/,
+        use:'html-withimg-loader'
+    }
+   ` 
+    **打包**时可优化的点 ：
+     
+    html img 的src 的值可以是图片地址，增加了图片的请求性能损耗！
+    src 还可以是base64位的数据值！文件大小大了大概0.3。
+    html的数据量大了，但是请求消耗小了！图片比较小的时候用很好的！适合首页性能优化！
+    这时候，用到url-loader了，而不是 file-loader!!!
+    url-loader 替换的是file-loader:
     
+    一旦文件超出limit，会**自动用file-loader，不用设置file-loader!!但是要下载这个依赖**！！！！
 
+    ` {   //为了小图片，没必要发请求，打包的不是地址，而是图片的base64数据流，作为img的 src！放入js文件中，等待插入！
+         test:/\.(png|svg|jpg|gif|jpeg)$/,
+         use:{
+             loader:'url-loader',   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+             options:{
+                 limit:200*1024,
+                 esModule:false    ,  //文档说什么默认是用的es的import 导入文件模块的，
+                 outputPath: "images",  //打包后的文件目录
+             }
+         }
+     },
+    `
+    
+    
+    
+    
 
 

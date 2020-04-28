@@ -38,13 +38,54 @@ module.exports = {
         minimizer: [
             //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
             new OptimizeCssAssetsPlugin(),
-        ]
+        ],
+        // splitChunks: {  //img 转 base64，用的url-loader时候需要加，否则报错！
+        //     cacheGroups: {
+        //         styles: {
+        //             name: 'css/index',
+        //             test: /\.css$/,
+        //             chunks: 'all',
+        //             enforce: true
+        //         }
+        //     }
+        // },
     },
     externals: {  //不需要打包的依赖：比如外部用script的全局文件变量,内部文件中有人又导入这个依赖了
         jquery:'$'
     },
     module: {//模块
         rules: [  //规则,匹配文件，处理文件
+
+
+            // {   //图片打包，先引入图片，引入的值实质是一个hash的图片地址！！
+            //     test: /\.(png|svg|jpg|gif|jpeg)$/,
+            //     use: {
+            //         loader: "file-loader",
+            //         options: {
+            //             esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
+            //             // 而不是CommonJS ，这里不设置它，就会使得下面处理html的img失效，
+            //             // 我猜html-withimg-loader是commonJS 的结果写的，而es输出的结果成了一个对象了！
+            //             outputPath: "images",
+            //         }
+            //     }
+            // },
+
+            {   //为了小图片，没必要发请求，打包的不是地址，而是图片的base64数据流，作为img的 src！放入js文件中，等待插入！
+                //一旦文件超出limit，会自动用file-loader，不用设置file-loader!!但是要下载这个依赖！！！！
+                test:/\.(png|svg|jpg|gif|jpeg)$/,
+                use:{
+                    loader:'url-loader',   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+                    options:{
+                        limit:200*1024,
+                        esModule:false    ,  //文档说什么默认是用的es的import 导入文件模块的，
+                        outputPath: "images",  //打包后的文件目录
+                    }
+                }
+            },
+            { //处理html中的图片
+                test:/\.html$/,
+                use:'html-withimg-loader'  //图片很小的时候，不适合用，可以用url-loader ,src = base64数据流
+            },
             // {
             //     //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
             //     //loader 有顺序的,默认从右向左，从下到上执行！
@@ -88,6 +129,7 @@ module.exports = {
 
                 }
             },
+
             // {
             //     //校验：eslint
             //     // 需要 eslint ,eslint-loader ,并去其官网选择对应的设置，下载.eslintrc.json文件做配置！
@@ -111,6 +153,8 @@ module.exports = {
             //         options: '$'
             //     }]
             // },
+
+
 
         ]
     }
