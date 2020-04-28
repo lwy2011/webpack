@@ -388,7 +388,8 @@ production , development
   
   publicPath
   
-  ` {  
+  ` 
+  {  
        test: /\.(png|svg|jpg|gif|jpeg)$/,
        use: {
            loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
@@ -419,6 +420,50 @@ production , development
        ]
    }
   `
+  
+  ## 多页面打包
+  
+  - 入口：
+  
+  ` entry:{
+           home:"./src/index.js",other:'./src/other.js'   //多文件
+       },`
+  
+  
+  - 出口：
+  
+  ` output: {
+           // filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
+           filename: "[name].[hash:5].js",   //多文件
+           path: path.resolve(__dirname, "./dist") , //路径绝对路径
+           //publicPath: "http://baidu.com" ,  //静态资源的host地址拼接！图片，css，js文件们的url拼接,
+           // 这里设置，就是所有的静态资源都要跟它拼接，局部的都在各个打包的模块里进行单独设置！
+       },`
+  
+  - 插入html :
+  
+  chunks字段！ 几个页面，几个实例！
+  
+  `  new HtmlWebpackPlugin({  //多页面
+               template: "./src/index.html",  //html地址
+               filename: "home.html",  //输出文件名
+               minify: {  //压缩html
+                   removeAttributeQuotes: true, //删除html中的双引号
+                   collapseWhitespace: true, //折叠空行html
+                   hash: true, //缓存问题
+               },
+               chunks: ['home']
+           }),
+           new HtmlWebpackPlugin({  //多页面
+               template: "./src/index.html",  //html地址
+               filename: "other.html",  //输出文件名
+               minify: {  //压缩html
+                   removeAttributeQuotes: true, //删除html中的双引号
+                   collapseWhitespace: true, //折叠空行html
+                   hash: true, //缓存问题
+               },
+               chunks: ['other']
+           }),`
   
   
     
