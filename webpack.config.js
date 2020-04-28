@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const webpack = require('webpack')
 module.exports = {
     entry: "./src/index.js",//入口
     output: {
@@ -29,7 +30,9 @@ module.exports = {
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
             filename: "main.css"
         }),
-
+        new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
+            $:'jquery'
+        })
     ],
     optimization: {  //优化项,生产模式才用的：
         minimizer: [
@@ -94,17 +97,17 @@ module.exports = {
             //     enforce:'pre'   ,//强制先执行后处理js。
             // },
 
-            {    //暴露全局变量的时候，用expose-loader做，
-                // 同样的，入口文件，顶级优先导入jquery，否则先导入其他模块可能会用的时候，window.$还不存在！
-                test: require.resolve('jquery'),
-                use: [{
-                    loader: 'expose-loader',
-                    options: 'jQuery'
-                },{
-                    loader: 'expose-loader',
-                    options: '$'
-                }]
-            },
+            // {    //暴露全局变量的时候，用expose-loader做，
+            //     // 同样的，入口文件，顶级优先导入jquery，否则先导入其他模块可能会用的时候，window.$还不存在！
+            //     test: require.resolve('jquery'),
+            //     use: [{
+            //         loader: 'expose-loader',
+            //         options: 'jQuery'
+            //     },{
+            //         loader: 'expose-loader',
+            //         options: '$'
+            //     }]
+            // },
 
         ]
     }

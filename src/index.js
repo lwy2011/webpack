@@ -1,5 +1,5 @@
 require("./index.css");
-import $ from 'jquery'
+// import $ from 'jquery'
 //require("expose-loader?$!jquery");  //全局暴露jquery
 require("../0配置");
 // require('jquery')

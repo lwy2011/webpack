@@ -251,6 +251,7 @@ production , development
    //注意！！因为后续导入的包可能需要$,所以，先执行它，再引入后续的其他的包！！否则，后续的包拿不到的！
    
    或者在配置文件中设置：
+   同样需要入口文件顶层优先导入jquery!!!
    
    module: {
      rules: [{
@@ -267,6 +268,13 @@ production , development
    `
    2. webpack.providePlugin 每个模块都注入
    
+   哪里都不需要引入，自动有个环境变量存在！这里不是放在window上了！这是个环境变量！！
+   
+   `  plugins: [  //插件
+            new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
+                $:'jquery'
+            })
+        ],`
    
    3. 引入不打包，script标签形式！注意打包的时候，设置externals字段去掉它，因为script已经script标签引入了！
   
