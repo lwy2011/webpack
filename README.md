@@ -356,6 +356,72 @@ production , development
      },
     `
     
+  ## 打包文件到指定目录
+  
+  
+  在各个文件打包的模块内设置它的目录！
+  
+  - css文件比较特殊：
+  
+  `         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
+               filename: "/css/main.css"    //这里就是路径
+           }),
+  `
+  
+  - 图片处理： 
+  
+  outputPath
+  `  {  
+       test: /\.(png|svg|jpg|gif|jpeg)$/,
+       use: {
+           loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+           options: {
+               limit: 200 * 1024,
+               esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
+               outputPath: "images",  //打包后的文件目录
+           }
+       }
+   },
+  `
+  
+  - 图片，css，js文件的url，自动补全，添加host
+  
+  publicPath
+  
+  ` {  
+       test: /\.(png|svg|jpg|gif|jpeg)$/,
+       use: {
+           loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+           options: {
+               limit: 200 * 1024,
+               esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
+               outputPath: "images",  //打包后的文件目录
+               publicPath: 'localhost:3000/dist/images'   //静态资源的host补全
+           }
+       }
+   },
+   
+     {
+       test: /\.s?css$/,
+       use: [
+           // {
+           //     loader: "style-loader",
+           //     //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
+           // },
+           // 'style-loader',   //css数据流放入style标签
+           //压缩css文件：
+           {
+               loader: MiniCssExtractPlugin.loader,
+               options: {
+                   publicPath: 'localhost:3000/dist/css'   //静态资源的host补全
+               }
+           }, //独立成一个css文件
+       ]
+   }
+  `
+  
+  
+    
     
     
     

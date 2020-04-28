@@ -2,12 +2,14 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const webpack = require('webpack')
+const webpack = require("webpack");
 module.exports = {
     entry: "./src/index.js",//入口
     output: {
         filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
-        path: path.resolve(__dirname, "./dist")  //路径绝对路径
+        path: path.resolve(__dirname, "./dist") , //路径绝对路径
+        //publicPath: "http://baidu.com" ,  //静态资源的host地址拼接！图片，css，js文件们的url拼接,
+        // 这里设置，就是所有的静态资源都要跟它拼接，局部的都在各个打包的模块里进行单独设置！
     },
     mode: "development", //生产模式，开发模式 production
     devServer: {  //开发服务器配置
@@ -28,7 +30,7 @@ module.exports = {
             }
         }),
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
-            filename: "main.css"
+            filename: "css/main.css" ,   //这里可以设置文件的目录！！！
         }),
         // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
         //     $:'jquery'
@@ -39,19 +41,10 @@ module.exports = {
             //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
             new OptimizeCssAssetsPlugin(),
         ],
-        // splitChunks: {  //img 转 base64，用的url-loader时候需要加，否则报错！
-        //     cacheGroups: {
-        //         styles: {
-        //             name: 'css/index',
-        //             test: /\.css$/,
-        //             chunks: 'all',
-        //             enforce: true
-        //         }
-        //     }
-        // },
+
     },
     externals: {  //不需要打包的依赖：比如外部用script的全局文件变量,内部文件中有人又导入这个依赖了
-        jquery:'$'
+        jquery: "$"
     },
     module: {//模块
         rules: [  //规则,匹配文件，处理文件
@@ -72,19 +65,20 @@ module.exports = {
 
             {   //为了小图片，没必要发请求，打包的不是地址，而是图片的base64数据流，作为img的 src！放入js文件中，等待插入！
                 //一旦文件超出limit，会自动用file-loader，不用设置file-loader!!但是要下载这个依赖！！！！
-                test:/\.(png|svg|jpg|gif|jpeg)$/,
-                use:{
-                    loader:'url-loader',   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
-                    options:{
-                        limit:200*1024,
-                        esModule:false    ,  //文档说什么默认是用的es的import 导入文件模块的，
+                test: /\.(png|svg|jpg|gif|jpeg)$/,
+                use: {
+                    loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+                    options: {
+                        limit: 200 * 1024,
+                        esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
                         outputPath: "images",  //打包后的文件目录
+                        publicPath: 'localhost:3000/dist/images'   //静态资源的host补全
                     }
                 }
             },
             { //处理html中的图片
-                test:/\.html$/,
-                use:'html-withimg-loader'  //图片很小的时候，不适合用，可以用url-loader ,src = base64数据流
+                test: /\.html$/,
+                use: "html-withimg-loader"  //图片很小的时候，不适合用，可以用url-loader ,src = base64数据流
             },
             // {
             //     //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
@@ -103,7 +97,12 @@ module.exports = {
                     // },
                     // 'style-loader',   //css数据流放入style标签
                     //压缩css文件：
-                    MiniCssExtractPlugin.loader,   //独立成一个css文件
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: 'localhost:3000/dist/css'   //静态资源的host补全
+                        }
+                    }, //独立成一个css文件
                     "css-loader",   //css文件@import css文件
                     "postcss-loader",  //转成css数据类型后加前缀
                     "sass-loader"  //scss转为css
@@ -153,7 +152,6 @@ module.exports = {
             //         options: '$'
             //     }]
             // },
-
 
 
         ]
