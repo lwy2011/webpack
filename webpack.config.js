@@ -4,18 +4,25 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const webpack = require("webpack");
 module.exports = {
-    // entry: "./src/index.js",//入口
-    entry:{
-        home:"./src/index.js",other:'./src/other.js'   //多文件
-    },
+    entry: "./src/index.js",//入口
+    // entry:{
+    //     home:"./src/index.js",other:'./src/other.js'   //多文件
+    // },
     output: {
         // filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
-        filename: "[name].[hash:5].js",   //多文件
+        filename: "[name].js",   //多文件
         path: path.resolve(__dirname, "./dist") , //路径绝对路径
         //publicPath: "http://baidu.com" ,  //静态资源的host地址拼接！图片，css，js文件们的url拼接,
         // 这里设置，就是所有的静态资源都要跟它拼接，局部的都在各个打包的模块里进行单独设置！
     },
     mode: "development", //生产模式，开发模式 production
+    devtool: 'cheap-module-eval-source-map',    //源码映射：调试用的，多种配置
+    watch:true,  //响应式的打包
+    watchOptions: {
+        poll:1000,   //每秒轮询500次
+        aggregateTimeout: 500,   //防抖，一直输入代码，500毫秒后再打包
+        ignored: /node_modules/    ,   //忽略
+    },
     devServer: {  //开发服务器配置
         port: 3000,  //端口
         progress: true,//进度条
@@ -24,35 +31,35 @@ module.exports = {
         overlay: true, //eslint 校验代码语法不合规范就报错！
     },
     plugins: [  //插件
-        // new HtmlWebpackPlugin({
+        new HtmlWebpackPlugin({
+            template: "./src/index.html",  //html地址
+            filename: "index.html",  //输出文件名
+            minify: {  //压缩html
+                removeAttributeQuotes: true, //删除html中的双引号
+                collapseWhitespace: true, //折叠空行html
+                hash: true, //缓存问题
+            }
+        }),
+        // new HtmlWebpackPlugin({  //多页面
         //     template: "./src/index.html",  //html地址
-        //     filename: "index.html",  //输出文件名
+        //     filename: "home.html",  //输出文件名
         //     minify: {  //压缩html
         //         removeAttributeQuotes: true, //删除html中的双引号
         //         collapseWhitespace: true, //折叠空行html
         //         hash: true, //缓存问题
-        //     }
+        //     },
+        //     chunks: ['home']
         // }),
-        new HtmlWebpackPlugin({  //多页面
-            template: "./src/index.html",  //html地址
-            filename: "home.html",  //输出文件名
-            minify: {  //压缩html
-                removeAttributeQuotes: true, //删除html中的双引号
-                collapseWhitespace: true, //折叠空行html
-                hash: true, //缓存问题
-            },
-            chunks: ['home']
-        }),
-        new HtmlWebpackPlugin({  //多页面
-            template: "./src/index.html",  //html地址
-            filename: "other.html",  //输出文件名
-            minify: {  //压缩html
-                removeAttributeQuotes: true, //删除html中的双引号
-                collapseWhitespace: true, //折叠空行html
-                hash: true, //缓存问题
-            },
-            chunks: ['other']
-        }),
+        // new HtmlWebpackPlugin({  //多页面
+        //     template: "./src/index.html",  //html地址
+        //     filename: "other.html",  //输出文件名
+        //     minify: {  //压缩html
+        //         removeAttributeQuotes: true, //删除html中的双引号
+        //         collapseWhitespace: true, //折叠空行html
+        //         hash: true, //缓存问题
+        //     },
+        //     chunks: ['other']
+        // }),
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
             filename: "css/main.css" ,   //这里可以设置文件的目录！！！
         }),

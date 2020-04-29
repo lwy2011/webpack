@@ -465,8 +465,37 @@ production , development
                chunks: ['other']
            }),`
   
+  ## source map
   
-    
+  源码映射，调试到源代码！
+ 
+ ` devtool:'xxxxx'`
+ 
+ - sourcemap文件，标识行列：
+ 
+ `devtool:'source-map'
+ `
+ 
+ - 无文件，有行列：
+ 
+ `devtool:"eval-source-map"
+ `
+ - 无列，有单独文件：
+ 
+ `devtool:'cheap-module-source-map'
+ `
+ 
+ - 无文件，无行列，集成在打包后的文件中：
+ 
+ `devtool:'cheap-module-eval-source-map'
+ `  
+ 
+ ## watch 响应式打包
+ 
+ `watch:true`
+ - watchOptions   
+ 
+ 
     
     
     

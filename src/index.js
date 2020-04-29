@@ -46,6 +46,10 @@ console.log($, 555, window.$);
 
 //图片处理：需要file-loader
 const img = new Image();
-console.log(logo,'logo src');
+console.log(logo, "logo src");
 img.src = logo;
 document.body.appendChild(img);
+
+console.lo("test source map");
+
+console.log(446)
