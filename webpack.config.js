@@ -25,23 +25,33 @@ module.exports = {
         aggregateTimeout: 500,   //防抖，一直输入代码，500毫秒后再打包
         ignored: /node_modules/,   //忽略
     },
+    resolve: {
+        modules: [path.resolve("node_modules")],   //指定查找的目录，不需要默认机械查找，浪费时间
+        // alias: {  //别名配置，简单省事！
+        //     bootstrap: "bootstrap/dist/css/bootstrap.css"
+        // },
+        mainFields: [ //入口字段，优先匹配什么字段的
+            'style','main'
+        ],
+        extensions: ['js','css','scss','json'],  //省略掉文件后缀后，导入时，如何按顺序匹配
+    },
     devServer: {  //开发服务器配置
         port: 3000,  //端口
         progress: true,//进度条
         contentBase: "./dist", //打开的目录
         compress: true,//Gzip压缩
         overlay: true, //eslint 校验代码语法不合规范就报错！
-        before (app) {  //转发之前，调用方法，mock数据测试的！前端开发！
+        before(app) {  //转发之前，调用方法，mock数据测试的！前端开发！
             app.get("/api/user", (req, res) => {    //这里的路由要完全匹配的！！坑！
                 res.json({data: "mock test 不跨域！"});    //这里会中断后面的转发！！！
             });
         },
-        proxy:{
-           // '/api':'http://localhost:8081'   , //跨域设置，匹配当前webpack-dev-server的端口的'/api/***',转发给8081端口！
-            '/api':{
-                target:'http://localhost:8081',   //注意，一定要加上http://，否则报错！
-                pathRewrite:{        //前端自定义一级路由：
-                    '/api':''
+        proxy: {
+            // '/api':'http://localhost:8081'   , //跨域设置，匹配当前webpack-dev-server的端口的'/api/***',转发给8081端口！
+            "/api": {
+                target: "http://localhost:8081",   //注意，一定要加上http://，否则报错！
+                pathRewrite: {        //前端自定义一级路由：
+                    "/api": ""
                 }
             }
         },

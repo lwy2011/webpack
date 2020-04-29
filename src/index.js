@@ -60,3 +60,12 @@ xml.onload = () => {
     console.log(xml.response, "跨域测试！！");
 };
 xml.send();
+
+//import "bootstrap";  //test resolve 配置，设置默认查找路径
+// 报错，./node_modules/bootstrap/dist/js/bootstrap.js。不是css文件！！！
+
+//import 'bootstrap/dist/css/bootstrap.css'  //如此才对！！但是太麻烦了，用到alias字段了！
+import 'bootstrap'  //配置了alias之后，可以方便导入了！
+
+
+import 'b'  //省略css文件后缀，如何配置resolve，extensions 扩展名

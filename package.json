@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server",
+    "dev": "webpack-dev-server --open",
     "server": "node ./src/server.js"
   },
   "devDependencies": {
@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",
+    "bootstrap": "^4.4.1",
     "jquery": "^3.5.0"
   }
 }
