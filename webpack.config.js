@@ -2,8 +2,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 module.exports = {
     entry: "./src/index.js",//入口
@@ -13,17 +13,17 @@ module.exports = {
     output: {
         // filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
         filename: "[name].js",   //多文件
-        path: path.resolve(__dirname, "./dist") , //路径绝对路径
+        path: path.resolve(__dirname, "./dist"), //路径绝对路径
         //publicPath: "http://baidu.com" ,  //静态资源的host地址拼接！图片，css，js文件们的url拼接,
         // 这里设置，就是所有的静态资源都要跟它拼接，局部的都在各个打包的模块里进行单独设置！
     },
     mode: "development", //生产模式，开发模式 production
-    devtool: 'cheap-module-eval-source-map',    //源码映射：调试用的，多种配置
-    watch:true,  //响应式的打包
+    devtool: "cheap-module-eval-source-map",    //源码映射：调试用的，多种配置
+    watch: true,  //响应式的打包
     watchOptions: {
-        poll:1000,   //每秒轮询500次
+        poll: 1000,   //每秒轮询500次
         aggregateTimeout: 500,   //防抖，一直输入代码，500毫秒后再打包
-        ignored: /node_modules/    ,   //忽略
+        ignored: /node_modules/,   //忽略
     },
     devServer: {  //开发服务器配置
         port: 3000,  //端口
@@ -31,6 +31,21 @@ module.exports = {
         contentBase: "./dist", //打开的目录
         compress: true,//Gzip压缩
         overlay: true, //eslint 校验代码语法不合规范就报错！
+        before (app) {  //转发之前，调用方法，mock数据测试的！前端开发！
+            app.get("/api/user", (req, res) => {    //这里的路由要完全匹配的！！坑！
+                res.json({data: "mock test 不跨域！"});    //这里会中断后面的转发！！！
+            });
+        },
+        proxy:{
+           // '/api':'http://localhost:8081'   , //跨域设置，匹配当前webpack-dev-server的端口的'/api/***',转发给8081端口！
+            '/api':{
+                target:'http://localhost:8081',   //注意，一定要加上http://，否则报错！
+                pathRewrite:{        //前端自定义一级路由：
+                    '/api':''
+                }
+            }
+        },
+
     },
     plugins: [  //插件
         new HtmlWebpackPlugin({
@@ -63,18 +78,18 @@ module.exports = {
         //     chunks: ['other']
         // }),
         new MiniCssExtractPlugin({  //抽离css单独成一个css文件
-            filename: "css/main.css" ,   //这里可以设置文件的目录！！！
+            filename: "css/main.css",   //这里可以设置文件的目录！！！
         }),
         // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
         //     $:'jquery'
         // }),
         new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
-        new CopyPlugin(
-            [
-                {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
-            ]
-        ),    //打包时，拷贝一些目录到打包的路径下
-        new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示
+        // new CopyPlugin(
+        //     [
+        //         {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
+        //     ]
+        // ),    //打包时，拷贝一些目录到打包的路径下
+        // new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示
     ],
     optimization: {  //优化项,生产模式才用的：
         minimizer: [
@@ -112,7 +127,7 @@ module.exports = {
                         limit: 200 * 1024,
                         esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
                         outputPath: "images",  //打包后的文件目录
-                        publicPath: 'localhost:3000/dist/images'   //静态资源的host补全
+                        publicPath: "localhost:3000/dist/images"   //静态资源的host补全
                     }
                 }
             },
@@ -140,7 +155,7 @@ module.exports = {
                     {
                         loader: MiniCssExtractPlugin.loader,
                         options: {
-                            publicPath: 'localhost:3000/dist/css'   //静态资源的host补全
+                            publicPath: "localhost:3000/dist/css"   //静态资源的host补全
                         }
                     }, //独立成一个css文件
                     "css-loader",   //css文件@import css文件

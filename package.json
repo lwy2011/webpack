@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "server": "node ./src/server.js"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -23,6 +24,7 @@
     "eslint": "^6.8.0",
     "eslint-loader": "^4.0.2",
     "expose-loader": "^0.7.5",
+    "express": "^4.17.1",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.2.0",
     "html-withimg-loader": "^0.1.16",
@@ -35,6 +37,7 @@
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
+    "webpack-dev-middleware": "^3.7.2",
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {

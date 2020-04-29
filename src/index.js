@@ -50,6 +50,13 @@ console.log(logo, "logo src");
 img.src = logo;
 document.body.appendChild(img);
 
-console.lo("test source map");
+// console.lo("test source map");  source map test
 
-console.log(446)
+const xml = new XMLHttpRequest();
+xml.open("GET", "/api/user", true);
+//这里访问的是当前webpack-dev-server的端口，webpack的server监听，然后转发！
+//http-proxy设置
+xml.onload = () => {
+    console.log(xml.response, "跨域测试！！");
+};
+xml.send();

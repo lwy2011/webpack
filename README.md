@@ -522,7 +522,74 @@ production , development
  
  `new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示`
  
+## 跨域
+
+
+- proxy
+
+请求的host是当前的webpack-dev-server的！
+webpack-dev-server也是个server，它可以接收到请求，然后自己再转发给真的目标路由！
+
+请求：
+
+`const xml = new XMLHttpRequest();
+ xml.open("GET", "/api/user", true);
+ //这里访问的是当前webpack-dev-server的端口，webpack的server监听，然后转发！
+ //http-proxy设置
+ xml.onload = () => {
+     console.log(xml.response, "跨域测试！！");
+ };
+ xml.send();`
  
+ 配置文件：
+ 
+ ` devServer: {  //开发服务器配置
+          port: 3000,  //端口
+          progress: true,//进度条
+          contentBase: "./dist", //打开的目录
+          compress: true,//Gzip压缩
+          overlay: true, //eslint 校验代码语法不合规范就报错！
+          before (app) {  //转发之前，调用方法，mock数据测试的！前端开发！
+              app.get("/api/user", (req, res) => {    //这里的路由要完全匹配的！！坑！
+                  res.json({data: "mock test 不跨域！"});    //这里会中断后面的转发！！！
+              });
+          },
+          proxy:{
+             // '/api':'http://localhost:8081'   , //跨域设置，匹配当前webpack-dev-server的端口的'/api/***',转发给8081端口！
+              '/api':{
+                  target:'http://localhost:8081',   //注意，一定要加上http://，否则报错！
+                  pathRewrite:{        //前端自定义一级路由：
+                      '/api':''
+                  }
+              }
+          },
+      },
+    `
+      
+      目标server：
+
+ `const express = require("express");
+  const webpack = require("webpack");
+  const webpackDevMiddle = require("webpack-dev-middleware");
+  const config = require("../webpack.config");
+  //const webs = webpack(config);
+  //打包生成当前服务器的host文件！而不是webpack-dev-server的server,无法用before mock了！
+  const server = express();
+  //server.use(webpackDevMiddle(webs));
+  server.get("/user", (req, res) => {
+      res.send({data: "test 跨域！！"});
+  });
+  server.listen(8081, () => {
+      console.log("server start!");
+  });
+  `
+ 
+ - mock 数据
+ 
+ 在webpack-dev-server拿到请求后，就不转发了，自己回复mock的数据！用的before钩子函数！
+ 
+ - 在server端进行打包，使得webpack-dev-server与server的host其实是一个。
+ 就是在服务端开发前端页面了！
  
     
     
