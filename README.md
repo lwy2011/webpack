@@ -611,7 +611,7 @@ resolve: {
         mainFields: [ //入口字段，优先匹配什么字段的
             'style','main'
         ],
-        extensions: ['js','css','scss','json'],  //省略掉文件后缀后，导入时，如何按顺序匹配
+        extensions: ['.js','.css','.scss','.json'],  //省略掉文件后缀后，导入时，如何按顺序匹配
     },`
 
 - 很多导入准确的文件依赖很难：
@@ -624,5 +624,23 @@ resolve: {
  - 如何导入时，不写文件后缀？
  
  `import 'b'  //省略css文件后缀，如何配置resolve，extensions 扩展名`
+ 
+ 
+##  定义环境变量
+
+webpack.DefinePlugin
+
+` new webpack.DefinePlugin({  //定义环境变量，跟全局变量很像！只不过是简单的值，一般都是常量，比如区分dev,pro。
+             MODE:"'dev'",
+             xyz:888
+         }),`
+
+## 区分不同的环境
+
+webpack-merge  //合并对象的！
+dev,pro的分开的配置文件！
+webpack.config.base.js
+webpack.config.dev.js
+webpack.config.pro.js
 
 

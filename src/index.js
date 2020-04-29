@@ -68,4 +68,10 @@ xml.send();
 import 'bootstrap'  //配置了alias之后，可以方便导入了！
 
 
-import 'b'  //省略css文件后缀，如何配置resolve，extensions 扩展名
+import './b'  //省略css文件后缀，如何配置resolve，extensions 扩展名
+
+
+//定义环境变量 ：
+
+const url = MODE === 'dev' ? 'localhost:3000' : 'http://baidu.com'
+console.log(url,888,'环境变量测试',xyz);
