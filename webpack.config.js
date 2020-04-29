@@ -2,6 +2,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require("webpack");
 module.exports = {
     entry: "./src/index.js",//入口
@@ -65,7 +67,14 @@ module.exports = {
         }),
         // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
         //     $:'jquery'
-        // })
+        // }),
+        new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
+        new CopyPlugin(
+            [
+                {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
+            ]
+        ),    //打包时，拷贝一些目录到打包的路径下
+        new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示
     ],
     optimization: {  //优化项,生产模式才用的：
         minimizer: [

@@ -495,6 +495,34 @@ production , development
  `watch:true`
  - watchOptions   
  
+ `watchOptions: {
+          poll:1000,   //每秒轮询500次
+          aggregateTimeout: 500,   //防抖，一直输入代码，500毫秒后再打包
+          ignored: /node_modules/    ,   //忽略
+      },`
+      
+ ## clean-webpack-plugin
+ 
+ 每次打包都会先清除dist目录，然后重新创建dist目录，打包！
+ `        new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
+`
+ 
+ ## copy-webpack-plugin
+ 
+ 把一些目录文件拷贝到dist目录下，打包时！！
+ 
+ `  new CopyPlugin(
+              [
+                  {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
+              ]
+          ),    //打包时，拷贝一些目录到打包的路径下
+    `
+ 
+ ## bannerPlugin
+ 
+ `new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示`
+ 
+ 
  
     
     

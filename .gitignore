@@ -1,5 +1,9 @@
-/node_modules/
+
 
 /dist/
 
 /.idea/
+/node_modules/
+.DS_Store
+src/.DS_Store
+!/node_modules/
