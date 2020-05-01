@@ -650,5 +650,201 @@ webpack.config.pro.js
 
 `noParse:/jquery/`    //module中的字段
 
+## 打包时指定排除或包含的目录地址
+
+`  {  //转es5
+     test: /\.m?js$/,
+     exclude: /node_modules/,  //查找的js文件的范围，还有include:
+     include: path.resolve(__dirname, "src"),
+     use: {
+         loader: "babel-loader",   //解析js文件数据
+         options: {
+             presets: [
+                 "@babel/preset-env",
+                 "@babel/preset-react" ,  //解析react的
+             ],   //映射转化一些高级语法
+             plugins: [
+                 ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                 ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                 //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                 "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+             ],
+         },
+     }
+ },`
+
+## 对一个包的多个依赖进行筛选加载，先全部都不加载，再自己手动加载，自己需要的！
+
+手动引入包的一些依赖，强制所有的默认引入忽略，进行包的体积优化！，moment为例   ：    
+moment有多重语言支持的语言包，默认全加载各国语言！！太大了！
+默认require的加载忽略掉，然后手动导入自己的所需！这是思路！
+
+import moment from "moment";
+
+// import 'moment/locale/zh-cn'
+moment.locale("zh-cn");
+//坑！！我试了下，盲猜moment做了优化了，默认只导入英语，或者指定的语言！
+// 害我试了好久，发现怎么操作，匹配都是打包无明显变化！
+// 通过不设置忽略加载，我这里做了语言选择，发现一直都是英语而不是中文，这里也可以有些猜疑了！！这案例要更新了！！
+console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！test");
+
+技能点就是：
+` new webpack.IgnorePlugin(    //手动禁止默认加载的依赖包，需要文件中手动导入自己所需要的包！！！
+             /\*+\/locale\*+/,    //包的那些依赖名字的字段
+             /moment/    //哪个包
+         )
+         而导入区那里，要自己手动导入：
+          import 'moment/locale/zh-cn'
+   `
+   原理明白就好！这个所谓的官方范例，估计要崩了！
+   
+## 动态链接库
+
+ react + react-dom为例：
+ 
+ 问题：一些dependents，非devdependents！它们保持不变！开发时每次都会导入，触发解析和打包！
+ 每次的解析和打包后的结果都一样！如何一次性打包后，以后开发就不打包解析它们了，直接拿打包后的结果多好！
+ 优化点其实是开发时重复的解析打包的消耗！
+ 
+ 用的是动态链接库！
+ 原理就是面向上面的目标的！以react,react-dom这两个依赖来说，
+ 单独把他两个打包压缩了！
+ 然后建立映射：
+ 原本如何导入react,react-dom的，用法不变！保持官方统一一致！
+ 然后让webpack建立映射！在导入时，先去匹配一个字典！这个字典记录了打包压缩的文件数据，与查找路径的映射！
+ 如何生成这个字典？？
+ 那就只能在打包压缩那些文件的时候，建立了！这是约定规范的意义！
+ 
+ - 打包 + 建立字典映射规范：
+ webpack.react.js:   打包一个react.js文件，内容随意：
+ `const path = require("path");
+  module.exports = {
+      entry: {react: "./react.js"},
+      output: {
+          filename: "[name].js",
+          path: path.resolve(__dirname, "./dist")
+      },
+      mode: "development"
+  };
+ `
+ 
+ 打包后的结果是个闭包函数，函数的返回值是文件的module.exports的值！
+ 这个值跟文件路径是想要的字典的键值对！
+ 如何生成键？？？
+ ` output: {
+          filename: "[name].js",
+          path: path.resolve(__dirname, "./dist"),
+          library: 'react'  //这里加个这个，会对打包的闭包函数的值赋值，
+          //得到了 var react = 那个闭包函数 = react.js文件的module.exports的值
+      },`
+ 
+ - 开始正式实现：
+ `module.exports = {
+      entry: {react: ['react','react-dom']}, //打包模块
+      output: {
+          filename: "_dll_[name].js",   //拼接name
+          path: path.resolve(__dirname, "./dist"),
+          library: '_dll_[name]', // 一致性,值就是文件的导出数据值
+      },
+      mode: "development",
+      plugins: [
+          new webpack.DllPlugin({  //建立字典
+              name : '_dll_[name]',
+              path : path.resolve(__dirname,'dist','manifest.json')
+          })
+      ]
+  };
+ `
+ 字典 = manifest.json :
+ `{
+      "name": "_dll_react",
+      "content": {
+          "./node_modules/object-assign/index.js": {
+              "id": "./node_modules/object-assign/index.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/prop-types/checkPropTypes.js": {
+              "id": "./node_modules/prop-types/checkPropTypes.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/prop-types/lib/ReactPropTypesSecret.js": {
+              "id": "./node_modules/prop-types/lib/ReactPropTypesSecret.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/react-dom/cjs/react-dom.development.js": {
+              "id": "./node_modules/react-dom/cjs/react-dom.development.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/react-dom/index.js": {
+              "id": "./node_modules/react-dom/index.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/react/cjs/react.development.js": {
+              "id": "./node_modules/react/cjs/react.development.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/react/index.js": {
+              "id": "./node_modules/react/index.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/scheduler/cjs/scheduler-tracing.development.js": {
+              "id": "./node_modules/scheduler/cjs/scheduler-tracing.development.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/scheduler/cjs/scheduler.development.js": {
+              "id": "./node_modules/scheduler/cjs/scheduler.development.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/scheduler/index.js": {
+              "id": "./node_modules/scheduler/index.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          },
+          "./node_modules/scheduler/tracing.js": {
+              "id": "./node_modules/scheduler/tracing.js",
+              "buildMeta": {
+                  "providedExports": true
+              }
+          }
+      }
+  }`
+ 
+ - 如何用字典直接拿到依赖的包？？
+ 
+ 首先把打包文件导入到html中，成为一个全局的对象！
+ 
+ `<script src="./_dll_react.js"></script>
+这里我犯错了！导入的url，是从dist目录为开始路径设置的！！
+`
+  webpack.config.js中：
+  拦截默认查找react,react-dom到node_modules里找，去字典里去匹配，
+  ` new webpack.DllReferencePlugin({  //
+               manifest:path.resolve(__dirname,'dist',"manifest.json")
+           })
+  `
+  实际打包的体积小了2M左右，想想多减压吧！当然这是对开发时的优化，而不是生产时候还要如此分开打包的！
+  
+  
+    
+   
 
 

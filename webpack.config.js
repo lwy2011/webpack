@@ -31,9 +31,9 @@ module.exports = {
         //     bootstrap: "bootstrap/dist/css/bootstrap.css"
         // },
         mainFields: [ //入口字段，优先匹配什么字段的
-            'style','main'
+            "style", "main"
         ],
-        extensions: ['.js','.scss','.css','.json'],  //省略掉文件后缀后，导入时，如何按顺序匹配
+        extensions: [".js", ".scss", ".css", ".json"],  //省略掉文件后缀后，导入时，如何按顺序匹配
     },
     // devServer: {  //开发服务器配置
     //     port: 3000,  //端口
@@ -101,9 +101,16 @@ module.exports = {
         // ),    //打包时，拷贝一些目录到打包的路径下
         // new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示
         new webpack.DefinePlugin({  //定义环境变量，跟全局变量很像！
-            MODE:"'dev'",
-            xyz:888
+            MODE: "'dev'",
+            xyz: 888
         }),
+        new webpack.IgnorePlugin(    //手动禁止默认加载的依赖包，需要文件中手动导入自己所需要的包！！！
+            /\.\/locale\*+/,    //包的那些依赖名字的字段
+            /moment/    //哪个包
+        ),
+        new webpack.DllReferencePlugin({  //
+            manifest:path.resolve(__dirname,'dist',"manifest.json")
+        })
     ],
     // optimization: {  //优化项,生产模式才用的：
     //     minimizer: [
@@ -180,23 +187,22 @@ module.exports = {
             },
             {  //转es5
                 test: /\.m?js$/,
-                exclude: /(node_modules|bower_components)/,
+                exclude: /node_modules/,  //查找的js文件的范围，还有include:
+                include: path.resolve(__dirname, "src"),
                 use: {
                     loader: "babel-loader",   //解析js文件数据
                     options: {
                         presets: [
                             "@babel/preset-env",
-                            "@babel/preset-react" ,  //解析react的
+                            "@babel/preset-react",  //解析react的
                         ],   //映射转化一些高级语法
                         plugins: [
                             ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
                             ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
                             //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
-                            "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
-
+                            "@babel/plugin-transform-runtime",
+                            //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
                         ],
-                        exclude: /node_modules/,  //查找的js文件的范围，还有include:
-                        include: path.resolve(__dirname, "src"),
                     },
 
                 }

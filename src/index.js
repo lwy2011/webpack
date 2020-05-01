@@ -65,22 +65,47 @@ xml.send();
 // 报错，./node_modules/bootstrap/dist/js/bootstrap.js。不是css文件！！！
 
 //import 'bootstrap/dist/css/bootstrap.css'  //如此才对！！但是太麻烦了，用到alias字段了！
-import 'bootstrap'  //配置了alias之后，可以方便导入了！
+import "bootstrap";  //配置了alias之后，可以方便导入了！
 
 
-import './b'  //省略css文件后缀，如何配置resolve，extensions 扩展名
+import "./b";  //省略css文件后缀，如何配置resolve，extensions 扩展名
 
 
 //定义环境变量 ：
 
-const url = MODE === 'dev' ? 'localhost:3000' : 'http://baidu.com'
-console.log(url,888,'环境变量测试',xyz);
+const url = MODE === "dev" ? "localhost:3000" : "http://baidu.com";
+console.log(url, 888, "环境变量测试", xyz);
 
 
 //优化  ：
 
 //react 导入测试：
 
-import React from 'react'
+import React from "react";
 
 console.log(React);
+
+
+//手动引入包的一些依赖，强制所有的默认引入忽略，进行包的体积优化！，moment为例
+
+//moment有多重语言支持的语言包，默认全加载各国语言！！太大了！
+//默认require的加载忽略掉，然后手动导入自己的所需！这是思路！
+import moment from "moment";
+
+// import 'moment/locale/zh-cn'
+moment.locale("zh-cn");
+//坑！！我试了下，盲猜moment做了优化了，默认只导入英语，或者指定的语言！
+// 害我试了好久，发现怎么操作，匹配都是打包无明显变化！
+// 通过不设置忽略加载，我这里做了语言选择，发现一直都是英语而不是中文，这里也可以有些猜疑了！！这案例要更新了！！
+console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！test");
+
+//动态链接库
+
+
+import {render} from "react-dom";
+
+console.log(render);
+const dom = <h1>jsx 动态链接库的test！</h1>;
+render(
+    dom, document.body.querySelector('div')
+);
