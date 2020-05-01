@@ -208,7 +208,6 @@ production , development
                       ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
                       //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
                       "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
-    
                   ],
               },
           }
@@ -246,13 +245,10 @@ production , development
    require("expose-loader?libraryName!./file.js");
    // 通过属性名 "libraryName" 暴露 file.js 的 exports 到全局上下文。
    // 在浏览器中，就将可以使用 window.libraryName 访问。
-   
    require("expose-loader?$!jquery"); 
-   //注意！！因为后续导入的包可能需要$,所以，先执行它，再引入后续的其他的包！！否则，后续的包拿不到的！
-   
+   //注意！！因为后续导入的包可能需要$,所以，先执行它，再引入后续的其他的包！！否则，后续的包拿不到的！   
    或者在配置文件中设置：
-   同样需要入口文件顶层优先导入jquery!!!
-   
+   同样需要入口文件顶层优先导入jquery!!! 
    module: {
      rules: [{
              test: require.resolve('jquery'),
@@ -642,5 +638,17 @@ dev,pro的分开的配置文件！
 webpack.config.base.js
 webpack.config.dev.js
 webpack.config.pro.js
+
+
+# 优化
+
+## react  与 babel
+
+`@babel/preset-react`  专门解析react的！
+
+## 打包时，不去解析某些包，不去看它的依赖！忽略掉某些包，比如jquery，这种不依赖其他包的包！
+
+`noParse:/jquery/`    //module中的字段
+
 
 

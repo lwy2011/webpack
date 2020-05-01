@@ -116,6 +116,7 @@ module.exports = {
     //     jquery: "$"
     // },
     module: {//模块
+        noParse: [/jquery/],  //打包时不去解析某些包的依赖库，提升打包效率
         rules: [  //规则,匹配文件，处理文件
 
 
@@ -183,7 +184,10 @@ module.exports = {
                 use: {
                     loader: "babel-loader",   //解析js文件数据
                     options: {
-                        presets: ["@babel/preset-env"],   //映射转化一些高级语法
+                        presets: [
+                            "@babel/preset-env",
+                            "@babel/preset-react" ,  //解析react的
+                        ],   //映射转化一些高级语法
                         plugins: [
                             ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
                             ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器

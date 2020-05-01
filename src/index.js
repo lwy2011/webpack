@@ -75,3 +75,12 @@ import './b'  //省略css文件后缀，如何配置resolve，extensions 扩展�
 
 const url = MODE === 'dev' ? 'localhost:3000' : 'http://baidu.com'
 console.log(url,888,'环境变量测试',xyz);
+
+
+//优化  ：
+
+//react 导入测试：
+
+import React from 'react'
+
+console.log(React);
