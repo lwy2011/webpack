@@ -896,7 +896,26 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
        }]
    })`
    
-   
+  ## webpack 自带优化
+  
+  - tree shaking 
+  没引用到包里的一些属性的代码，就不会production打包进来！注意：**import 引入**才可以！！
+  es6模块会把结果放在default上！
+  es6导入的属性代码才会被打包，导入的包的其他的不用的代码，不会被production打包进来！
+  require 不支持！！！
+  
+  - scope hosting 
+  作用域提升！ production 模式！！！
+  自动省略中间过程性的代码，可以简化，等效的结果代替！
+  `
+  let a = 4
+  let b = 3
+  let c = 7
+  let d =  a+b+c
+  conmsole.log(d)
+  //打包这一堆代码得出： console.log(14)
+  `
+  
   
     
    
