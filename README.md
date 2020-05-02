@@ -844,6 +844,60 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
   实际打包的体积小了2M左右，想想多减压吧！当然这是对开发时的优化，而不是生产时候还要如此分开打包的！
   
   
+  ## 多线程打包
+  
+  happypack 依赖！作用在loader那里！
+  注意，项目比较大，某种类型的文件打包很耗时，可以用。因为开辟新线程工作也是要消耗时间的！
+  
+  module中 ：
+  
+  ` {  //转es5
+       test: /\.m?js$/,
+       exclude: /node_modules/,  //查找的js文件的范围，还有include:
+       include: path.resolve(__dirname, "src"),
+       use: "Happypack/loader?id=js", //多线程打包：哪种类型的打包比较耗时，就单独开辟一个线程专门打包，多线程并行
+       // use: {
+       //     loader: "babel-loader",   //解析js文件数据
+       //     options: {
+       //         presets: [
+       //             "@babel/preset-env",
+       //             "@babel/preset-react",  //解析react的
+       //         ],   //映射转化一些高级语法
+       //         plugins: [
+       //             ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+       //             ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+       //             //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+       //             "@babel/plugin-transform-runtime",
+       //             //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+       //         ],
+       //     },
+       //
+       // }
+   },
+  `
+  plugin中：
+  ` new Happypack({  //多线程打包设置，适用于一些类型的包的打包时间比较长的时候！
+       id:'js',
+       use: [{
+           loader: "babel-loader",   //解析js文件数据
+           options: {
+               presets: [
+                   "@babel/preset-env",
+                   "@babel/preset-react",  //解析react的
+               ],   //映射转化一些高级语法
+               plugins: [
+                   ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                   ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                   //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                   "@babel/plugin-transform-runtime",
+                   //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+               ],
+           },
+       }]
+   })`
+   
+   
+  
     
    
 

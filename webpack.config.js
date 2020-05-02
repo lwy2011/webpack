@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 // const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
+const Happypack = require("happypack");
 module.exports = {
     entry: "./src/index.js",//入口
     // entry:{
@@ -109,7 +110,26 @@ module.exports = {
             /moment/    //哪个包
         ),
         new webpack.DllReferencePlugin({  //
-            manifest:path.resolve(__dirname,'dist',"manifest.json")
+            manifest: path.resolve(__dirname, "dist", "manifest.json")
+        }),
+        new Happypack({  //多线程打包设置，适用于一些类型的包的打包时间比较长的时候！
+            id:'js',
+            use: [{
+                loader: "babel-loader",   //解析js文件数据
+                options: {
+                    presets: [
+                        "@babel/preset-env",
+                        "@babel/preset-react",  //解析react的
+                    ],   //映射转化一些高级语法
+                    plugins: [
+                        ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                        ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                        //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                        "@babel/plugin-transform-runtime",
+                        //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+                    ],
+                },
+            }]
         })
     ],
     // optimization: {  //优化项,生产模式才用的：
@@ -189,23 +209,24 @@ module.exports = {
                 test: /\.m?js$/,
                 exclude: /node_modules/,  //查找的js文件的范围，还有include:
                 include: path.resolve(__dirname, "src"),
-                use: {
-                    loader: "babel-loader",   //解析js文件数据
-                    options: {
-                        presets: [
-                            "@babel/preset-env",
-                            "@babel/preset-react",  //解析react的
-                        ],   //映射转化一些高级语法
-                        plugins: [
-                            ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
-                            ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
-                            //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
-                            "@babel/plugin-transform-runtime",
-                            //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
-                        ],
-                    },
-
-                }
+                use: "Happypack/loader?id=js", //多线程打包：哪种类型的打包比较耗时，就单独开辟一个线程专门打包，多线程并行
+                // use: {
+                //     loader: "babel-loader",   //解析js文件数据
+                //     options: {
+                //         presets: [
+                //             "@babel/preset-env",
+                //             "@babel/preset-react",  //解析react的
+                //         ],   //映射转化一些高级语法
+                //         plugins: [
+                //             ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                //             ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                //             //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                //             "@babel/plugin-transform-runtime",
+                //             //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+                //         ],
+                //     },
+                //
+                // }
             },
 
             // {
