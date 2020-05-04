@@ -968,6 +968,24 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
   
   
   
+  ## 懒加载
+  通过js，动态加载文件并解析成js数据类型。用的是**import!**!!
+  用import 语法在js文件中导入文件模块，然后返回的是一个promise！这是webpack提供的import的骚操作！
+  VUe ， React的路由懒加载，都是通过这样的原理实现的！
+  `const div = document.createElement("div");
+   div.innerText = "懒加载文件";
+   document.body.appendChild(div);
+   div.addEventListener("click", () => {
+       alert("clicked!");
+       //es6草案的语法，jsonp实现动态加载文件！！
+       import("./lazy-loading").then(
+           data => {
+               console.log(data);
+           }
+       );
+   });`
+  
+  
   
   
     

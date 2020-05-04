@@ -107,10 +107,25 @@ import {render} from "react-dom";
 console.log(render);
 const dom = <h1>jsx 动态链接库的test！</h1>;
 render(
-    dom, document.body.querySelector('div')
+    dom, document.body.querySelector("div")
 );
 
 //多页面打包，抽离公共代码，抽离第三方公共依赖！
-import './a'
-import './b'
-import 'jquery'
+import "./a";
+import "./b";
+import "jquery";
+
+//懒加载：
+
+const div = document.createElement("div");
+div.innerText = "懒加载文件";
+document.body.appendChild(div);
+div.addEventListener("click", () => {
+    alert("clicked!");
+    //es6草案的语法，jsonp实现动态加载文件！！
+    import("./lazy-loading").then(
+        data => {
+            console.log(data);
+        }
+    );
+});

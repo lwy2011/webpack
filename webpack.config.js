@@ -7,10 +7,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const Happypack = require("happypack");
 module.exports = {
-    // entry: "./src/index.js",//入口
-    entry:{
-        home:"./src/index.js",other:'./src/other.js'   //多文件
-    },
+    entry: "./src/index.js",//入口
+    // entry:{
+    //     home:"./src/index.js",other:'./src/other.js'   //多文件
+    // },
     output: {
         // filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
         filename: "[name].js",   //多文件
