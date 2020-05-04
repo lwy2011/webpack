@@ -916,6 +916,59 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
   //打包这一堆代码得出： console.log(14)
   `
   
+  ## 抽离公共代码
+  多页面共有的代码，就会抽取！跟之前的动态链接库有些同样类似的价值！减少不必要的打包开销！
+  抽离目标：公共的代码，公共的第三方模块！公共的代码就包含了公共的第三方模块了。
+  但是公共的第三方模块单独打包比较好！所以需要配置权限的！
+  optimization -> splitChunks -> cacheGroups -> common
+  
+  - 抽离公共代码：
+  `
+   optimization: {  //优化项,生产模式才用的：
+      minimizer: [
+          //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
+          new OptimizeCssAssetsPlugin(),
+      ],
+      splitChunks:{ //分割代码块
+          cacheGroups:{ //缓存组
+              common:{//公共的模块
+                  chunks:'initial',
+                  minSize:0,
+                  minChunks:2,  //这里是至少两次依赖
+              }
+          }
+      }
+  },`
+  
+  - 抽离公共的第三方依赖：
+  
+  ` optimization: {  //优化项,生产模式才用的：
+       minimizer: [
+           //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
+           new OptimizeCssAssetsPlugin(),
+       ],
+       splitChunks:{ //分割代码块
+           cacheGroups:{ //缓存组
+               common:{//公共的模块
+                   chunks:'initial',
+                   minSize:0,
+                   minChunks:2,  //这里是至少两次依赖
+               },
+               vendor:{   //因为代码是从上到下执行的，它会先执行common那里，连带着抽离了第三方依赖：
+                   //所以，想要单独抽离出来第三方依赖，需要权重：
+                   priority:1,   //权重，先抽离第三方依赖，没有这个，只会把所有的公共代码全抽离成一个文件
+                   test:/node_modules/  , //抽离模块匹配
+                   chunks:'initial',
+                   minSize:0,
+                   minChunks:2,  //这里是至少两次依赖
+               }
+           }
+       }
+    },`
+  
+  
+  
+  
   
     
    

@@ -97,7 +97,7 @@ module.exports = smart(
             // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
             //     $:'jquery'
             // }),
-            new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
+            // new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
             // new CopyPlugin(
             //     [
             //         {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
@@ -114,11 +114,27 @@ module.exports = smart(
                 //对css文件的压缩，这里js文件不会默认压缩，需要配置js的压缩：
                 new OptimizeCssAssetsPlugin(),
             ],
-
+            splitChunks:{ //分割代码块
+                cacheGroups:{ //缓存组
+                    common:{//公共的模块
+                        chunks:'initial',
+                        minSize:0,
+                        minChunks:2,  //这里是至少两次依赖
+                    },
+                    vendor:{   //因为代码是从上到下执行的，它会先执行common那里，连带着抽离了第三方依赖：
+                        //所以，想要单独抽离出来第三方依赖，需要权重：
+                        priority:1,   //权重，先抽离第三方依赖
+                        test:/node_modules/  , //抽离模块匹配
+                        chunks:'initial',
+                        minSize:0,
+                        minChunks:2,  //这里是至少两次依赖
+                    }
+                }
+            }
         },
-        externals: {  //不需要打包的依赖：比如外部用script的全局文件变量,内部文件中有人又导入这个依赖了
-            jquery: "$"
-        },
+        // externals: {  //不需要打包的依赖：比如外部用script的全局文件变量,内部文件中有人又导入这个依赖了
+        //     jquery: "$"
+        // },
         module: {//模块
             rules: [  //规则,匹配文件，处理文件
 
@@ -136,23 +152,23 @@ module.exports = smart(
                 //     }
                 // },
 
-                {   //为了小图片，没必要发请求，打包的不是地址，而是图片的base64数据流，作为img的 src！放入js文件中，等待插入！
-                    //一旦文件超出limit，会自动用file-loader，不用设置file-loader!!但是要下载这个依赖！！！！
-                    test: /\.(png|svg|jpg|gif|jpeg)$/,
-                    use: {
-                        loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
-                        options: {
-                            limit: 200 * 1024,
-                            esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
-                            outputPath: "images",  //打包后的文件目录
-                            publicPath: "localhost:3000/dist/images"   //静态资源的host补全
-                        }
-                    }
-                },
-                { //处理html中的图片
-                    test: /\.html$/,
-                    use: "html-withimg-loader"  //图片很小的时候，不适合用，可以用url-loader ,src = base64数据流
-                },
+                // {   //为了小图片，没必要发请求，打包的不是地址，而是图片的base64数据流，作为img的 src！放入js文件中，等待插入！
+                //     //一旦文件超出limit，会自动用file-loader，不用设置file-loader!!但是要下载这个依赖！！！！
+                //     test: /\.(png|svg|jpg|gif|jpeg)$/,
+                //     use: {
+                //         loader: "url-loader",   //html-withimg-loader 那边流到这里，只要图片大小很小，就不走file-loader
+                //         options: {
+                //             limit: 200 * 1024,
+                //             esModule: false,  //文档说什么默认是用的es的import 导入文件模块的，
+                //             outputPath: "images",  //打包后的文件目录
+                //             publicPath: "localhost:3000/dist/images"   //静态资源的host补全
+                //         }
+                //     }
+                // },
+                // { //处理html中的图片
+                //     test: /\.html$/,
+                //     use: "html-withimg-loader"  //图片很小的时候，不适合用，可以用url-loader ,src = base64数据流
+                // },
                 // {
                 //     //css-loader 解析css文件引入css文件的，style-loader把css文件数据插入到html中
                 //     //loader 有顺序的,默认从右向左，从下到上执行！
@@ -160,47 +176,47 @@ module.exports = smart(
                 //     test:/\.css$/,
                 //     use:['style-loader','css-loader']
                 // },
-                {
-                    // less , sass stylus node-sass sass-loader ,stylus stylus-loader
-                    test: /\.s?css$/,
-                    use: [
-                        // {
-                        //     loader: "style-loader",
-                        //     //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
-                        // },
-                        // 'style-loader',   //css数据流放入style标签
-                        //压缩css文件：
-                        {
-                            loader: MiniCssExtractPlugin.loader,
-                            options: {
-                                publicPath: "localhost:3000/dist/css"   //静态资源的host补全
-                            }
-                        }, //独立成一个css文件
-                        "css-loader",   //css文件@import css文件
-                        "postcss-loader",  //转成css数据类型后加前缀
-                        "sass-loader"  //scss转为css
-                    ]
-                },
-                {  //转es5
-                    test: /\.m?js$/,
-                    exclude: /(node_modules|bower_components)/,
-                    use: {
-                        loader: "babel-loader",   //解析js文件数据
-                        options: {
-                            presets: ["@babel/preset-env"],   //映射转化一些高级语法
-                            plugins: [
-                                ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
-                                ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
-                                //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
-                                "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
-
-                            ],
-                            exclude: /node_modules/,  //查找的js文件的范围，还有include:
-                            include: path.resolve(__dirname, "src"),
-                        },
-
-                    }
-                },
+                // {
+                //     // less , sass stylus node-sass sass-loader ,stylus stylus-loader
+                //     test: /\.s?css$/,
+                //     use: [
+                //         // {
+                //         //     loader: "style-loader",
+                //         //     //options: {insert: "top"}  //控制打包后的css标签放在html内的原本有的style标签前面，覆盖用的
+                //         // },
+                //         // 'style-loader',   //css数据流放入style标签
+                //         //压缩css文件：
+                //         {
+                //             loader: MiniCssExtractPlugin.loader,
+                //             options: {
+                //                 publicPath: "localhost:3000/dist/css"   //静态资源的host补全
+                //             }
+                //         }, //独立成一个css文件
+                //         "css-loader",   //css文件@import css文件
+                //         "postcss-loader",  //转成css数据类型后加前缀
+                //         "sass-loader"  //scss转为css
+                //     ]
+                // },
+                // {  //转es5
+                //     test: /\.m?js$/,
+                //     exclude: /(node_modules|bower_components)/,
+                //     use: {
+                //         loader: "babel-loader",   //解析js文件数据
+                //         options: {
+                //             presets: ["@babel/preset-env"],   //映射转化一些高级语法
+                //             plugins: [
+                //                 ["@babel/plugin-proposal-decorators", {"legacy": true}],//class
+                //                 ["@babel/plugin-proposal-class-properties", {"loose": true}], //装饰器
+                //                 //多个引用转译后的代码，会使同一个被转译的目标多次被转译，代码浪费：
+                //                 "@babel/plugin-transform-runtime", //同时还依赖@babel/runtime，生产环境时候，帮着产生补丁的，这是代码本身的依赖，不是 -dev--save
+                //
+                //             ],
+                //             exclude: /node_modules/,  //查找的js文件的范围，还有include:
+                //             include: path.resolve(__dirname, "src"),
+                //         },
+                //
+                //     }
+                // },
 
                 // {
                 //     //校验：eslint

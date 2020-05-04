@@ -109,3 +109,8 @@ const dom = <h1>jsx 动态链接库的test！</h1>;
 render(
     dom, document.body.querySelector('div')
 );
+
+//多页面打包，抽离公共代码，抽离第三方公共依赖！
+import './a'
+import './b'
+import 'jquery'

@@ -1,5 +1,7 @@
 import js1 from "../0配置";
-
+import './a'
+import './b'
+import 'jquery'
 console.log($);
 
 class O {

@@ -7,10 +7,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const Happypack = require("happypack");
 module.exports = {
-    entry: "./src/index.js",//入口
-    // entry:{
-    //     home:"./src/index.js",other:'./src/other.js'   //多文件
-    // },
+    // entry: "./src/index.js",//入口
+    entry:{
+        home:"./src/index.js",other:'./src/other.js'   //多文件
+    },
     output: {
         // filename: "bundle.[hash:5].js",  //文件名，哈希，避免覆盖，或者缓存问题
         filename: "[name].js",   //多文件
@@ -109,7 +109,7 @@ module.exports = {
             /\.\/locale\*+/,    //包的那些依赖名字的字段
             /moment/    //哪个包
         ),
-        new webpack.DllReferencePlugin({  //
+        new webpack.DllReferencePlugin({  //动态链接库
             manifest: path.resolve(__dirname, "dist", "manifest.json")
         }),
         new Happypack({  //多线程打包设置，适用于一些类型的包的打包时间比较长的时候！
@@ -143,7 +143,7 @@ module.exports = {
     //     jquery: "$"
     // },
     module: {//模块
-        noParse: [/jquery/],  //打包时不去解析某些包的依赖库，提升打包效率
+        // noParse: [/jquery/],  //打包时不去解析某些包的依赖库，提升打包效率
         rules: [  //规则,匹配文件，处理文件
 
 
