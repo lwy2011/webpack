@@ -984,6 +984,36 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
            }
        );
    });`
+   
+   
+   打包后：
+   原本的lazy-loading.js内容：
+   
+   `export default  '懒加载test!!'`
+   
+   
+   生成了1.js文件。文件内容就是打包后的lazy-loading.js的打包内容：
+   
+   `(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[1],{
+    /***/ 18:
+    /***/ (function(module, __webpack_exports__, __webpack_require__) { 
+    "use strict";
+    __webpack_require__.r(__webpack_exports__);
+    /* harmony default export */ __webpack_exports__["default"] = ('懒加载test!!');  
+    /***/ })    
+    }]);`
+   
+   打包后的index.js是这样的：
+   
+   `var div = document.createElement("div");
+    div.innerText = "懒加载文件";
+    document.body.appendChild(div);
+    div.addEventListener("click", function () {
+      alert("clicked!"); //es6草案的语法，jsonp实现动态加载文件！！
+      __webpack_require__.e(/* import() */ 1).then(__webpack_require__.bind(null, 18)).then(function (data) {
+        console.log(data);
+      });
+    });`
   
   
   
