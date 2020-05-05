@@ -1104,6 +1104,11 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
                    require('../0配置.js')  //重新解析
                })
            }`
-   
+           
+## Tapable
 
+webpack 本质，事件流机制！将各个插件串联起来，核心就是Tapable，有些类似node的events库，原理也是依赖发布订阅模式！
+
+- SyncHook  
+本质是个同步的事件注册，并执行的钩子！
 

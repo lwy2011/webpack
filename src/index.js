@@ -137,3 +137,23 @@ if (module.hot){
         require('../0配置.js')  //重新解析
     })
 }
+
+// Tapable：
+
+class SyncHook {
+    constructor(arr) {
+        this.tasks = arr||[]   //存储事件发布的回调函数的！
+    }
+    tap(name,task){
+        //订阅,注册：
+        this.tasks.push(task)
+    }
+    call(...arg){
+        //发布：
+        this.tasks.map(
+            task=>task(...arg)
+        )
+    }
+    //其实它就是个任务队列的功能而已啊！！
+}
+
