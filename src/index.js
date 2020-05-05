@@ -129,3 +129,11 @@ div.addEventListener("click", () => {
         }
     );
 });
+
+//热更新设置：
+if (module.hot){
+    module.hot.accept( '../0配置.js',()=>{
+        console.log("hot update!!");
+        require('../0配置.js')  //重新解析
+    })
+}

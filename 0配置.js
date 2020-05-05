@@ -6,4 +6,4 @@ class B {
 }
 
 const b = new B();
-console.log($,'www');
+console.log($,'w09e3');

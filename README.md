@@ -1015,10 +1015,95 @@ console.log(moment().endOf("day").fromNow(), "moment 按需加载依赖！！tes
       });
     });`
   
+## 热更新
   
+  development 模式下的优化！
+  强制更新与热更新！！增量更新，更新变化的内容，不变的就不重新解析打包，而不是重新解析并打包所有，然后刷新页面！
   
-  
-    
+  `
+   devServer: {  //开发服务器配置
+              port: 3000,  //端口
+              progress: true,//进度条
+              contentBase: "./dist", //打开的目录
+              compress: true,//Gzip压缩
+              overlay: true, //eslint 校验代码语法不合规范就报错！
+              before(app) {  //转发之前，调用方法，mock数据测试的！前端开发！
+                  app.get("/api/user", (req, res) => {    //这里的路由要完全匹配的！！坑！
+                      res.json({data: "mock test 不跨域！"});    //这里会中断后面的转发！！！
+                  });
+              },
+              proxy: {
+                  // '/api':'http://localhost:8081'   , //跨域设置，匹配当前webpack-dev-server的端口的'/api/***',转发给8081端口！
+                  "/api": {
+                      target: "http://localhost:8081",   //注意，一定要加上http://，否则报错！
+                      pathRewrite: {        //前端自定义一级路由：
+                          "/api": ""
+                      }
+                  }
+              },
+              hot:true,   //启用热更新！
+          },
+           plugins: [  //插件
+                      // new HtmlWebpackPlugin({
+                      //     template: "./src/index.html",  //html地址
+                      //     filename: "index.html",  //输出文件名
+                      //     minify: {  //压缩html
+                      //         removeAttributeQuotes: true, //删除html中的双引号
+                      //         collapseWhitespace: true, //折叠空行html
+                      //         hash: true, //缓存问题
+                      //     }
+                      // }),
+                      // new HtmlWebpackPlugin({  //多页面
+                      //     template: "./src/index.html",  //html地址
+                      //     filename: "home.html",  //输出文件名
+                      //     minify: {  //压缩html
+                      //         removeAttributeQuotes: true, //删除html中的双引号
+                      //         collapseWhitespace: true, //折叠空行html
+                      //         hash: true, //缓存问题
+                      //     },
+                      //     chunks: ['home']
+                      // }),
+                      // new HtmlWebpackPlugin({  //多页面
+                      //     template: "./src/index.html",  //html地址
+                      //     filename: "other.html",  //输出文件名
+                      //     minify: {  //压缩html
+                      //         removeAttributeQuotes: true, //删除html中的双引号
+                      //         collapseWhitespace: true, //折叠空行html
+                      //         hash: true, //缓存问题
+                      //     },
+                      //     chunks: ['other']
+                      // }),
+                      // new MiniCssExtractPlugin({  //抽离css单独成一个css文件
+                      //     filename: "css/main.css",   //这里可以设置文件的目录！！！
+                      // }),
+                      // new webpack.ProvidePlugin({  //全局各个模块默认注入变量：
+                      //     $:'jquery'
+                      // }),
+                      // new CleanWebpackPlugin(),  //每次打包都会删掉dist，重新创建
+                      // new CopyPlugin(
+                      //     [
+                      //         {from:'copy',to:'copy'} , //这里to，默认是打包的根目录下的相对位置
+                      //     ]
+                      // ),    //打包时，拷贝一些目录到打包的路径下
+                      // new webpack.BannerPlugin(`by liu ,timer = ${new Date()}`), //打包时添加首行标注提示
+                      // new webpack.DefinePlugin({  //定义环境变量，跟全局变量很像！
+                      //     MODE:"'dev'",
+                      //     xyz:888
+                      // }),
+                      new webpack.HotModuleReplacementPlugin(), //热更新插件
+                      new webpack.NamedModulesPlugin(),  //打印更新的模块路径
+                  ],`
+                  
+                  
+           导入模块的文件中：
+           `
+           //热更新设置：
+           if (module.hot){
+               module.hot.accept( '../0配置.js',()=>{
+                   console.log("hot update!!");
+                   require('../0配置.js')  //重新解析
+               })
+           }`
    
 
 

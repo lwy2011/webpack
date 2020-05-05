@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 // const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 // const CopyPlugin = require("copy-webpack-plugin");
-// const webpack = require("webpack");
+const webpack = require("webpack");
 const {smart} = require("webpack-merge");
 const base = require("./webpack.config");
 module.exports = smart(
@@ -59,7 +59,7 @@ module.exports = smart(
                     }
                 }
             },
-
+            hot:true,   //启用热更新！
         },
         plugins: [  //插件
             // new HtmlWebpackPlugin({
@@ -108,6 +108,8 @@ module.exports = smart(
             //     MODE:"'dev'",
             //     xyz:888
             // }),
+            new webpack.HotModuleReplacementPlugin(), //热更新插件
+            new webpack.NamedModulesPlugin(),  //打印更新的模块路径
         ],
         // optimization: {  //优化项,生产模式才用的：
         //     minimizer: [
