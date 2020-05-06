@@ -131,29 +131,98 @@ div.addEventListener("click", () => {
 });
 
 //热更新设置：
-if (module.hot){
-    module.hot.accept( '../0配置.js',()=>{
+if (module.hot) {
+    module.hot.accept("../0配置.js", () => {
         console.log("hot update!!");
-        require('../0配置.js')  //重新解析
-    })
+        require("../0配置.js");  //重新解析
+    });
 }
 
 // Tapable：
 
 class SyncHook {
     constructor(arr) {
-        this.tasks = arr||[]   //存储事件发布的回调函数的！
+        this.tasks = arr || [];   //存储事件发布的回调函数的！
     }
-    tap(name,task){
+
+    tap(name, task) {
         //订阅,注册：
-        this.tasks.push(task)
+        this.tasks.push(task);
     }
-    call(...arg){
+
+    call(...arg) {
         //发布：
         this.tasks.map(
-            task=>task(...arg)
-        )
+            task => task(...arg)
+        );
     }
+
     //其实它就是个任务队列的功能而已啊！！
 }
 
+class SyncBailHook {
+    constructor(arr) {
+        this.tasks = arr || [];
+    }
+
+    tap(name, task) {
+        //订阅,注册：
+        this.tasks.push(task);
+    }
+
+    call(...arg) {
+        //发布：
+        let res, index = 0;
+        do {
+            res = this.tasks[index](arg);
+        } while (index < this.tasks.length && !res);
+    }
+}
+
+class SyncWaterfallHook {
+    constructor(arr) {
+        this.tasks = arr || [];
+    }
+
+    tap(name, task) {
+        //订阅,注册：
+        this.tasks.push(task);
+    }
+
+    call(...arg) {
+        this.tasks.reduce(
+            (a, b) => b(arg, a)
+        );
+    }
+}
+
+class SyncLoopHook {
+    constructor(count, arr) {
+        this.tasks = arr || [];
+        this.count = count;
+    }
+
+    tap(name, task) {
+        //订阅,注册：
+        this.tasks.push(task);
+    }
+
+    call(...arg) {
+        let index = 0, res, count;
+        do {
+            res = this.tasks[index](arg);
+            if (res) {
+                if (count === 1) {
+                    count = undefined;
+                    return index++;
+                } else if (count === undefined) {
+                    count = this.count - 1;
+                } else {
+                    count -= 1;
+                }
+            } else {
+                index++;
+            }
+        } while (index < this.tasks.length);
+    }
+}

@@ -1112,3 +1112,95 @@ webpack 本质，事件流机制！将各个插件串联起来，核心就是Tap
 - SyncHook  
 本质是个同步的事件注册，并执行的钩子！
 
+`class SyncHook {
+     constructor(arr) {
+         this.tasks = arr||[]   //存储事件发布的回调函数的！
+     }
+     tap(name,task){
+         //订阅,注册：
+         this.tasks.push(task)
+     }
+     call(...arg){
+         //发布：
+         this.tasks.map(
+             task=>task(...arg)
+         )
+     }
+     //其实它就是个任务队列的功能而已啊！！
+ }`
+
+- SyncBailHook 保险，熔断性！！
+
+事件注册时，对事件队列进行控制，是否可以中断其中的队列回调函数不继续向下执行！！
+通过事件队列的返回值是否是true，是true就中断，不继续向下执行！
+
+`class SyncBailHook {
+    constructor(arr) {
+        this.tasks = arr || [];
+    }
+    tap(name, task) {
+        //订阅,注册：
+        this.tasks.push(task);
+    }
+    call(...arg) {
+        //发布：
+        let res,index=0
+        do {
+            res= this.tasks[index](arg)
+        }while (index<this.tasks.length && !res)
+    }
+}`
+
+- SyncWaterfallHook
+//执行的队列函数按顺序传值给下一个要执行的函数！
+
+`class SyncWaterfallHook {
+     constructor(arr) {
+         this.tasks = arr || [];
+     }
+     tap(name, task) {
+         //订阅,注册：
+         this.tasks.push(task);
+     }
+     call(...arg){
+         this.tasks.reduce(
+             (a,b)=>b(arg,a)
+         )
+     }
+ }
+`
+
+- SyncLoopHook
+执行某个队列中的函数，执行多次后再往下走！！
+也是遇到不返回undefined的函数，就多次执行这个函数，直到它返回undefined！
+
+`class SyncLoopHook {
+     constructor(count, arr) {
+         this.tasks = arr || [];
+         this.count = count;
+     }
+     tap(name, task) {
+         //订阅,注册：
+         this.tasks.push(task);
+     }
+     call(...arg) {
+         let index = 0, res, count;
+         do {
+             res = this.tasks[index](arg);
+             if (res) {
+                 if (count === 1) {
+                     count = undefined;
+                     return index++;
+                 } else if (count === undefined) {
+                     count = this.count - 1;
+                 } else {
+                     count -= 1;
+                 }
+             } else {
+                 index++;
+             }
+         } while (index < this.tasks.length);
+     }
+ }
+`
+
